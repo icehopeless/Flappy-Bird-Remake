@@ -1,4 +1,4 @@
-# Flappy Bird Remake 
+# Flappy Bird Remake !<img src="assets/game/icon.png" alt= "icon" width=40>
 remake do jogo flappy bird utilizado a [SFML lib](https://www.sfml-dev.org/index.php) com c++
 
 ## Branch baseada em Linux 
