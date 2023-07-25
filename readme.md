@@ -23,4 +23,3 @@ Atualize o path do seu SFML, colocando o \include no compile e o \lib no link
 <img src= "assets/game/json.png" alt="jsoncproperties">
 siga os comentarios e adicione os paths referentes
 
-<br><strong> obs: caso necessário, linke o path da sfml e do compilador g++
