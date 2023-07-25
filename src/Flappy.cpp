@@ -9,7 +9,7 @@ FlappyBird::FlappyBird(){
      sf::Style::Titlebar | sf::Style::Close
     );
     sf::Image Icon = sf::Image { };
-	Icon.loadFromFile("assets/Icon.png");
+	Icon.loadFromFile("assets/game/icon.png");
 	window->setIcon(Icon.getSize().x, Icon.getSize().y, Icon.getPixelsPtr());
     
     
@@ -18,22 +18,20 @@ FlappyBird::FlappyBird(){
     space = 100.0f;
     count = frame = 0;
     updateTexture = 0;
-    bg.loadFromFile("assets/WhatsApp Image 2023-07-24 at 18.25.40.jpeg");
-    bird_Texture[0].loadFromFile("assets/yellowbird-midflap.png");
-    bird_Texture[1].loadFromFile("assets/yellowbird-upflap.png");
-    bird_Texture[2].loadFromFile("assets/yellowbird-downflap.png");
-    credito_texture.loadFromFile("assets/information.png");
-    restart_texture.loadFromFile("assets/restart.png");
-    quit_texture.loadFromFile("assets/quit.png");
-    pipe.loadFromFile("assets/pipe-green.png");
-    font.loadFromFile("assets/CHERL___.TTF");
+    bg.loadFromFile("assets/game/map.jpeg");
+    bird_Texture[0].loadFromFile("assets/bird/bird-midflap.png");
+    bird_Texture[1].loadFromFile("assets/bird/bird-upflap.png");
+    bird_Texture[2].loadFromFile("assets/bird/bird-downflap.png");
+    restart_texture.loadFromFile("assets/gameover/restart.png");
+    quit_texture.loadFromFile("assets/gameover/quit.png");
+    pipe.loadFromFile("assets/game/pipe-green.png");
+    font.loadFromFile("assets/gameover/CHERL___.TTF");
     gmText.setFont(font);
     //ponteiros inteligentes para sprites
     background = make_shared<sf::Sprite>();
     bird = make_shared<sf::Sprite>();
     pipetop = make_shared<sf::Sprite>();
     pipeback = make_shared<sf::Sprite>();
-    credito = make_shared<sf::Sprite>();
     restart = make_shared<sf::Sprite>();
     quit = make_shared<sf::Sprite>();
 
@@ -41,7 +39,6 @@ FlappyBird::FlappyBird(){
     bird->setTexture(bird_Texture[0]);
     pipetop->setTexture(pipe);
     pipeback->setTexture(pipe);
-    credito->setTexture(credito_texture); 
     restart->setTexture(restart_texture); 
     quit->setTexture(quit_texture);
 
@@ -56,39 +53,21 @@ FlappyBird::FlappyBird(){
     pipetop->setRotation(180.f);
    
 
-   credito->setScale(.2f,.2f);
-   restart->setScale(.2f,.2f);
-   quit->setScale(.2f,.2f);
-
-    
-   restart->setPosition(620,350);
-   quit->setPosition(620,470);
-   credito->setPosition(620,590);
-
-    insta_texture.loadFromFile("assets/instagram.png");
-    git_texture.loadFromFile("assets/github.png");
-    insta = make_shared<sf::Sprite>();
-    git = make_shared<sf::Sprite>();
-    insta->setTexture(insta_texture);
-    git->setTexture(git_texture);
-    insta->setColor(sf::Color::Transparent);
-    git->setColor(sf::Color::Transparent);
-    git->setScale(0.1f, 0.1f);
-    insta->setScale(0.1f, 0.1f);
+    restart->setScale(.2f,.2f);
+    quit->setScale(.2f,.2f);
+    restart->setPosition(620,350);
+    quit->setPosition(620,470);
 }
 
 //eventos
 void FlappyBird::events(){ 
-
     sf::Event event;
-
     pos_mouse = sf::Mouse::getPosition(*window);
 	mouse_coord = window->mapPixelToCoords(pos_mouse);
 
     while(window->pollEvent(event)){      
         if(event.type == sf::Event::Closed){
             window->close();
-
         }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
             mouseup = true;
@@ -101,11 +80,8 @@ void FlappyBird::draw(){
     window->clear(sf::Color::Black);
     window->draw(*background);
     window->draw(*bird);
-    window->draw(*credito);
     window->draw(*restart);
     window->draw(*quit);
-     window->draw(*git);
-    window->draw(*insta);
     window->draw(gmText);
     for(auto &p : pipes){
         window->draw(p);
@@ -127,14 +103,11 @@ void FlappyBird::animation(){
 
 //movimentando os pipes
 void FlappyBird::movepipes(){
-    
-
     if (count % 150 == 0 ){ //criando pipe a cada 160
         int pos = rand() % 275 + 175;
         
         pipeback->setPosition(1280, pos+space);
         pipetop->setPosition(1280+120, pos-space);
-
         pipes.push_back(*pipeback);
         pipes.push_back(*pipetop);
     }
@@ -146,7 +119,6 @@ void FlappyBird::movepipes(){
         if(pipes[i].getPosition().x < -100){    
                pipes.erase(pipes.begin() + i);
         }
-
         pipes[i].move(-4.f, 0);
         }
 }
@@ -155,73 +127,47 @@ void FlappyBird::movepipes(){
 void FlappyBird::movebird(){
     bird->move(0, gravity); //move o bird somente no y
     gravity += 0.4f; // movimenta a gravidade 
-    mouseup == true ? bird->setRotation(-5.f) : bird->setRotation(0);
-
+    mouseup == true ? bird->setRotation(-7.f) : bird->setRotation(0); //animação de rotação ao clicar 
 }
 
 //chamando as funcoes referentes do jogo
 void FlappyBird::game(){
-    if(bird->getPosition().y > 720){
-       GameOver = true; 
-    }
-
     if(GameOver != true){
-    insta->setColor(sf::Color::Transparent);
-    git->setColor(sf::Color::Transparent);
     bird->setColor(sf::Color::White);
-    credito->setColor(sf::Color::Transparent);
     quit->setColor(sf::Color::Transparent);
     restart->setColor(sf::Color::Transparent);    
     gmText.setFillColor(sf::Color::Transparent);
     movepipes();
     animation();
     movebird();
+
     if(mouseup == true){
         gravity = -7.f;
-        mouseup = false;
-         
+        mouseup = false; 
     }
 
     }else{
         gameover();
     }
 }
-
+//perdeu o jogo
 void FlappyBird::gameover(){
-
+    window->draw(*background);
     gmText.setString("GameOver");
     gmText.setFillColor(sf::Color::Black);
     gmText.setCharacterSize(190);
     gmText.setPosition(200,0);
-
-    credito->setColor(sf::Color::White);
     quit->setColor(sf::Color::White);
     restart->setColor(sf::Color::White); 
+    bird->setColor(sf::Color::Transparent);
 
-    window->draw(*background);
-        bird->setColor(sf::Color::Transparent);
         for (int i = 0; i < pipes.size(); i++){ 
             
                  pipes.pop_back();
-
         }
 
-
-    
     if(restart->getGlobalBounds().contains(mouse_coord)){
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-            bird->setPosition(
-                500.0f - bird_Texture[0].getSize().x / 2.f,
-                300.0f - bird_Texture[0].getSize().x / 2.f
-             );
-
-         for (int i = 0; i < pipes.size(); i++){ 
-            
-                 pipes.pop_back();
-
-        }
-          GameOver = false;
-        }
+        restartgame();
     }
     
     if(quit->getGlobalBounds().contains(mouse_coord)){
@@ -230,21 +176,23 @@ void FlappyBird::gameover(){
 
         }
     }
-    if(credito->getGlobalBounds().contains(mouse_coord)){
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-            creditos();
+}
+//reinicia o jogo
+void FlappyBird::restartgame(){
+    if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+            bird->setPosition(
+                500.0f - bird_Texture[0].getSize().x / 2.f,
+                300.0f - bird_Texture[0].getSize().x / 2.f
+             );
+
+         for (int i = 0; i < pipes.size(); i++){ 
+                 pipes.pop_back();
+
         }
-    }
-
+          GameOver = false;
+          frame = 0;
+        }
 }
-
-void FlappyBird::creditos(){
-    insta->setColor(sf::Color::White);
-    git->setColor(sf::Color::White);
-    
-
-}
-
 
 //rodando tudo
 void FlappyBird::run(){
@@ -252,7 +200,6 @@ void FlappyBird::run(){
         events();
         draw();
         game();
-        
         count++; //contar frame
         frame++;
         if(count == 300){
